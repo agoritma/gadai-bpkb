@@ -8,7 +8,7 @@ const RequirementSection = ({ syaratList, reqList }) => {
                 <p className="desc">Lorem ipsum dolor sit amet consectetur. Amet aliquet vulputate id iaculis congue tincidunt consectetur odio nulla.</p>
                 <ul>
                     {syaratList?.map((syarat) => {
-                        return <li><p>{syarat}</p></li>
+                        return <li key={syarat}><p>{syarat}</p></li>
                     })}
                 </ul>
             </div>
@@ -17,7 +17,7 @@ const RequirementSection = ({ syaratList, reqList }) => {
                 <p className="desc">Lorem ipsum dolor sit amet consectetur. Amet aliquet vulputate id iaculis congue tincidunt consectetur odio nulla.</p>
                 <ul>
                     {reqList?.map((req) => {
-                        return <li><p>{req}</p></li>
+                        return <li key={req}><p>{req}</p></li>
                     })}
                 </ul>
             </div>

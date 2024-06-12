@@ -1,7 +1,7 @@
-const Button = ({ btn, text, url }) => {
+const Button = ({ btn, text, url, funcClick }) => {
     return (
         <div className={btn}>
-            <a href={url}>{text}</a>
+            <a onClick={funcClick}>{text}</a>
         </div>
     )
 }

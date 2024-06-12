@@ -11,7 +11,7 @@ const Jumbotron = () => {
                     <p>Lorem ipsum dolor sit amet consectetur. Sagittis sit malesuada eu tristique magnis pulvinar. Curabitur eu non nisl auctor ut cras. Posuere gravida facilisi malesuada eget molestie sed. Scelerisque adipiscing egestas volutpat elit et vitae faucibus.</p>
                 </div>
                 <div className="button-section">
-                    <Button btn="cta" text="Hitung Pinjaman Anda" url="#" />
+                    <Button btn="cta" text="Hitung Pinjaman Anda" url="#pinjaman" />
                     <Button btn="underline-btn" text="Lihat Syarat Yang Dibutuhkan" url="#" />
                 </div>
             </div>

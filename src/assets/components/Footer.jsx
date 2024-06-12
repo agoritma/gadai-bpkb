@@ -19,13 +19,8 @@ const Footer = ({ fbUrl, xUrl, ttUrl, ytUrl, igUrl }) => {
                 <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</p>
                 <p>Senin - Minggu | 09:00 - 17:00</p>
             </div>
-            <div className="detail flex flex-col">
-                <b><p>Perusahaan</p></b>
-                <a href="#">Tentang Kami</a>
-                <a href="#">Visi dan Misi</a>
-            </div> 
             <div className="product flex flex-col">
-                <b><p>Produk</p></b>
+                <b><p>Layanan</p></b>
                 <a href="#">Perhitungan Pinjaman</a>
                 <a href="#">Pengajuan Pinjaman</a>
             </div>
