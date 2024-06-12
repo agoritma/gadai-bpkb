@@ -1,11 +1,14 @@
-const FileFormElement = ({ labelText, elemRef, isDisabled = true, fileName = "Upload KTP Anda", funcClick }) => {
+const FileFormElement = ({ labelText, elemRef, isDisabled = true, fileName, funcChange}) => {
     return (
-        <label className="flex flex-col">
+        <label className="flex flex-col" htmlFor="">
             <span>{labelText}</span>
-            <div className={"filePlace flex "+isDisabled} onClick={funcClick}>
+            <label className={"filePlace flex "+isDisabled} htmlFor="ktp">
                 <span>{fileName}</span>
-                <input name={labelText} type="file" disabled={isDisabled} ref={elemRef} />
-            </div>
+            </label>
+            {isDisabled == false ?
+                <input id="ktp" name="ktp" type="file" disabled={isDisabled} ref={elemRef} onChange={funcChange} accept="image/png, image/jpg, image/jpeg"/>
+                : null
+            }
         </label>
     )
 }

@@ -8,7 +8,7 @@ const SpecialContainer = ({ h3, text, iconPath, bgColor, column }) => {
                 </div>
                 : null
             }
-            <p>{text}</p>
+            <p dangerouslySetInnerHTML={{__html: text}}></p>
         </div>
     )
 }

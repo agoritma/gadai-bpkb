@@ -344,7 +344,6 @@ label.file {
 select, input[type="text"], input[type="number"] {
     height: 4rem;
     padding: 0 1.25rem;
-    padding-right: 3rem;
     border-radius: 15px;
     -webkit-border-radius: 15px;
     -moz-border-radius: 15px;
@@ -362,6 +361,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 select {
+    padding-right: 3rem;
     white-space: nowrap;
     text-overflow: ellipsis;
     appearance: none;
@@ -373,10 +373,11 @@ select {
 }
 
 select:disabled {
+    background-color: #FAFAFA;
     background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="%23b0b0b0" d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>');
 }
 
-select:disabled, input[type="text"]:disabled {
+select:disabled, input[type="text"]:disabled, input[type="number"]:disabled {
     border: 1px solid #aeaeae;
 }
 

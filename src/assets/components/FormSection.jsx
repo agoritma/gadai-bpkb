@@ -6,20 +6,28 @@ import Button from "./Button"
 import SpecialContainer from "./SpecialContainer"
 import InputFormElement from "./InputForm"
 import FileFormElement from "./FileForm"
+import TransportRequestDetail from "../../api/TransportRequestDetail"
 
 const FormSection = () => {
     const merkSelect = useRef()
-    const tipeSelect = useRef()
+    const typeSelect = useRef()
     const modelSelect = useRef()
     const ccSelect = useRef()
     const jenisSelect = useRef()
     const bbmSelect = useRef()
     const transmisiSelect = useRef()
     const tahunSelect = useRef()
-    const [limit, setLimit] = useState({
-        "text": "halo"
-    })
-    const [found, setFound] = useState()
+
+    const [curmerk, setMerk] = useState([])
+    const [curtype, setType] = useState([])
+    const [curmodel, setModel] = useState([])
+    const [curcc, setCC] = useState([])
+    const [curjenis, setJenis] = useState([])
+    const [curbbm, setBBM] = useState([])
+    const [curtransmisi, setTransmisi] = useState([])
+    const [curtahun, setTahun] = useState([])
+    const [curresult, setResult] = useState(null)
+    const [detailSubmit, setDetailSubmit] = useState(false)
 
     const unitSelectedInput = useRef()
     const nikInput = useRef()
@@ -29,32 +37,240 @@ const FormSection = () => {
 
     const [fileName, setFileName] = useState("Upload Foto KTP Anda")
 
-    let dummyOptionList = [
-        "Honda asdas da asd asd asdas d",
-        "Suzuki",
-        "Asep"
-    ]
-
-    const formDetailSubmit = () => {
-        merkSelect.current.value = "-"
-        setFound(false)
-    }
-
-    const selectFromChange = (self) => {
-        setFound(true)
-        console.log(self.value)
+    const fileFormChange = () => {
+        let currFileName = fotoFileInput.current.value.replace(/.*[\/\\]/, '')
+        let sepFileName = currFileName.split(".")
+        let fileExtension = sepFileName[sepFileName.length - 1]
+        if (fileExtension == "png" || fileExtension == "jpg" || fileExtension == "jpeg") {
+            setFileName(currFileName)
+        } else {
+            fotoFileInput.current.value = ''
+            fotoFileInput.current.value = null
+            setFileName("Pastikan file berformat gambar (png, jpg, jpeg)")
+        }
     }
 
     useEffect(() => {
-        const initials = () => {
-            
+        const getMerk = async () => {
+            const resp = await TransportRequestDetail({merk:"/"})
+            const data = await resp.json()
+            setMerk(data.merk)
         }
 
-        initials()
+        getMerk()
     }, [])
 
-    const openFileForm = () => {
-        fotoFileInput.current.click()
+    const getType = async () => {
+        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value})
+        if (resp.status == 200 && merkSelect.current.value != "") {
+            const data = await resp.json()
+            setType(data.type)
+            setModel(null)
+            setCC(null)
+            setCC(null)
+            setJenis(null)
+            setBBM(null)
+            setTransmisi(null)
+            setTahun(null)
+            setDetailSubmit(false)
+            setResult(null)
+        } else {
+            setResult(null)
+            setType(null)
+            setModel(null)
+            setCC(null)
+            setCC(null)
+            setJenis(null)
+            setBBM(null)
+            setTransmisi(null)
+            setTahun(null)
+            setDetailSubmit(false)
+        }
+    }
+
+    const getModel = async () => {
+        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value, type: "/"+typeSelect.current.value})
+        if (resp.status == 200) {
+            const data = await resp.json()
+            if (data.model != undefined) {
+                setModel(data.model)
+                setCC(null)
+                setCC(null)
+                setJenis(null)
+                setBBM(null)
+                setTransmisi(null)
+                setTahun(null)
+                setResult(null)
+            } else {
+                setResult(null)
+                setModel(null)
+                setCC(null)
+                setCC(null)
+                setJenis(null)
+                setBBM(null)
+                setTransmisi(null)
+                setTahun(null)
+                setDetailSubmit(false)
+            }
+        }
+    }
+
+    const getCC = async () => {
+        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value,
+                                                    type: "/"+typeSelect.current.value,
+                                                    model: "/"+modelSelect.current.value})
+        if (resp.status == 200) {
+            const data = await resp.json()
+            if (data.cc != undefined) {
+                setCC(data.cc)
+                setJenis(null)
+                setBBM(null)
+                setTransmisi(null)
+                setTahun(null)
+                setResult(null)
+            } else {
+                setResult(null)
+                setCC(null)
+                setJenis(null)
+                setBBM(null)
+                setTransmisi(null)
+                setTahun(null)
+                setDetailSubmit(false)
+            }
+        }
+    }
+
+    const getJenis = async () => {
+        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value,
+                                                    type: "/"+typeSelect.current.value,
+                                                    model: "/"+modelSelect.current.value,
+                                                    cc: "/"+ccSelect.current.value})
+        if (resp.status == 200) {
+            const data = await resp.json()
+            if (data.jenis != undefined) {
+                setJenis(data.jenis)
+                setBBM(null)
+                setTransmisi(null)
+                setTahun(null)
+                setResult(null)
+            } else {
+                setResult(null)
+                setJenis(null)
+                setBBM(null)
+                setTransmisi(null)
+                setTahun(null)
+                setDetailSubmit(false)
+            }
+        }
+    }
+
+    const getBBM = async () => {
+        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value,
+                                                    type: "/"+typeSelect.current.value,
+                                                    model: "/"+modelSelect.current.value,
+                                                    cc: "/"+ccSelect.current.value,
+                                                    jenis: "/"+jenisSelect.current.value})
+        if (resp.status == 200) {
+            const data = await resp.json()
+            if (data.bbm != undefined) {
+                setBBM(data.bbm)
+                setTransmisi(null)
+                setTahun(null)
+                setResult(null)
+            } else {
+                setResult(null)
+                setBBM(null)
+                setTransmisi(null)
+                setTahun(null)
+                setDetailSubmit(false)
+            }
+        }
+    }
+
+    const getTransmisi = async () => {
+        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value,
+                                                    type: "/"+typeSelect.current.value,
+                                                    model: "/"+modelSelect.current.value,
+                                                    cc: "/"+ccSelect.current.value,
+                                                    jenis: "/"+jenisSelect.current.value,
+                                                    bbm: "/"+bbmSelect.current.value})
+        if (resp.status == 200) {
+            const data = await resp.json()
+            if (data.transmisi != undefined) {
+                setTransmisi(data.transmisi)
+                setTahun(null)
+                setResult(null)
+            } else {
+                setResult(null)
+                setTransmisi(null)
+                setTahun(null)
+                setDetailSubmit(false)
+            }
+        }
+    }
+
+    const getTahun = async () => {
+        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value,
+                                                    type: "/"+typeSelect.current.value,
+                                                    model: "/"+modelSelect.current.value,
+                                                    cc: "/"+ccSelect.current.value,
+                                                    jenis: "/"+jenisSelect.current.value,
+                                                    bbm: "/"+bbmSelect.current.value,
+                                                    transmisi: "/"+transmisiSelect.current.value})
+        if (resp.status == 200) {
+            const data = await resp.json()
+            if (data.tahun != undefined) {
+                setTahun(data.tahun)
+                setResult(null)
+            } else {
+                setResult(null)
+                setTahun(null)
+                setDetailSubmit(false)
+            }
+        }
+    }
+
+    const getFinalDetail = async () => {
+        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value,
+                                                    type: "/"+typeSelect.current.value,
+                                                    model: "/"+modelSelect.current.value,
+                                                    cc: "/"+ccSelect.current.value,
+                                                    jenis: "/"+jenisSelect.current.value,
+                                                    bbm: "/"+bbmSelect.current.value,
+                                                    transmisi: "/"+transmisiSelect.current.value,
+                                                    tahun: "/"+tahunSelect.current.value})
+        if (resp.status == 200 && tahunSelect.current.value != "") {
+            const data = await resp.json()
+            if (data.harga != undefined) {
+                setResult(data)
+            } else {
+                setResult(null)
+                setDetailSubmit(false)
+            }
+        } else {
+            setResult(null)
+            setDetailSubmit(false)
+        }
+    }
+
+    const getResult = async () => {
+        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value,
+                                                    type: "/"+typeSelect.current.value,
+                                                    model: "/"+modelSelect.current.value,
+                                                    cc: "/"+ccSelect.current.value,
+                                                    jenis: "/"+jenisSelect.current.value,
+                                                    bbm: "/"+bbmSelect.current.value,
+                                                    transmisi: "/"+transmisiSelect.current.value,
+                                                    tahun: "/"+tahunSelect.current.value})
+        if (resp.status == 200) {
+            const data = await resp.json()
+            if (data.harga != undefined) {
+                setResult(data)
+            } else {
+                setResult(null)
+                setDetailSubmit(false)
+            }
+        }
     }
 
     return (
@@ -65,29 +281,29 @@ const FormSection = () => {
                     <Header3 text={"Masukan Detail Kendaraan Anda"}/>
                     <div className="form flex flex-col">
                         <div className="flex flex-row">
-                            <SelectFormElement labelText={"Merk"} optionsList={dummyOptionList} funcChage={() => selectFromChange(merkSelect.current)} isDisabled={false} elemRef={merkSelect} />
-                            <SelectFormElement labelText={"Tipe"} optionsList={dummyOptionList} funcChage={() => selectFromChange(tipeSelect.current)} elemRef={tipeSelect} />
+                            <SelectFormElement labelText={"Merk"} optionsList={curmerk} funcChage={async () => await getType()} elemRef={merkSelect} />
+                            <SelectFormElement labelText={"Tipe"} optionsList={curtype} funcChage={async () => await getModel()} elemRef={typeSelect} />
                         </div>
                         <div className="flex flex-row">
-                            <SelectFormElement labelText={"Model"} optionsList={dummyOptionList} funcChage={() => selectFromChange(modelSelect.current)} elemRef={modelSelect} />
-                            <SelectFormElement labelText={"CC"} optionsList={dummyOptionList} funcChage={() => selectFromChange(ccSelect.current)} elemRef={ccSelect} />
-                            <SelectFormElement labelText={"Jenis"} optionsList={dummyOptionList} funcChage={() => selectFromChange(jenisSelect.current)} elemRef={jenisSelect} />
+                            <SelectFormElement labelText={"Model"} optionsList={curmodel} funcChage={async () => await getCC()} elemRef={modelSelect} />
+                            <SelectFormElement labelText={"CC"} optionsList={curcc} funcChage={async () => await getJenis()} elemRef={ccSelect} />
+                            <SelectFormElement labelText={"Jenis"} optionsList={curjenis} funcChage={async () => await getBBM()} elemRef={jenisSelect} />
                         </div>
                         <div className="flex flex-row">
-                            <SelectFormElement labelText={"BBM"} optionsList={dummyOptionList} funcChage={() => selectFromChange(bbmSelect.current)} elemRef={bbmSelect} />
-                            <SelectFormElement labelText={"Transmisi"} optionsList={dummyOptionList} funcChage={() => selectFromChange(transmisiSelect.current)} elemRef={transmisiSelect} />
-                            <SelectFormElement labelText={"Tahun"} optionsList={dummyOptionList} funcChage={() => selectFromChange(tahunSelect.current)} elemRef={tahunSelect} />
+                            <SelectFormElement labelText={"BBM"} optionsList={curbbm} funcChage={async () => await getTransmisi()} elemRef={bbmSelect} />
+                            <SelectFormElement labelText={"Transmisi"} optionsList={curtransmisi} funcChage={async () => await getTahun()} elemRef={transmisiSelect} />
+                            <SelectFormElement labelText={"Tahun"} optionsList={curtahun} funcChage={async () => await getFinalDetail()} elemRef={tahunSelect} />
                         </div>
                         <div className="button-section flex flex-row">
-                            {found === true ?
-                                <Button btn={"cta"} text={"Hitung Limit Anda"} funcClick={formDetailSubmit}/>
+                            {curresult ?
+                                <Button btn={"cta"} text={"Hitung Limit Anda"} funcClick={() => setDetailSubmit(true)} />
                                 : <Button btn={"cta disabled"} text={"Hitung Limit Anda"}/>
                             }
                             <Button btn={"underline-btn"} text={"Ada Masalah? Hubungi Kami"} url={"#"} />
                         </div>
                     </div>
-                    {limit.text ?
-                        <SpecialContainer text={limit.text} bgColor={"rgb(64, 165, 120)"}/>
+                    {detailSubmit && curresult ?
+                        <SpecialContainer text={`Selamat! Anda memiliki <b>limit pinjaman ${curresult.harga}</b> dari <b>${curresult.desc}</b> milik anda`} bgColor={"rgb(64, 165, 120)"}/>
                         : null
                     }
                 </div>
@@ -98,18 +314,18 @@ const FormSection = () => {
                             <InputFormElement labelText={"Unit Yang Dipilih"} elemRef={unitSelectedInput} />
                         </div>
                         <div className="flex flex-row">
-                            <InputFormElement isDisabled={false} typeInput="number" labelText={"NIK"} elemRef={nikInput} />
+                            <InputFormElement labelText={"NIK"} elemRef={nikInput} />
                             <InputFormElement labelText={"Nama (Sesuai KTP)"} elemRef={namaInput} />
                         </div>
                         <div className="flex flex-row">
-                            <FileFormElement labelText={"Foto KTP"} elemRef={fotoFileInput} />
+                            <FileFormElement labelText={"Foto KTP"} elemRef={fotoFileInput} fileName={fileName} funcChange={fileFormChange}/>
                         </div>
                         <div className="flex flex-row">
                             <InputFormElement labelText={"Nomor Whatsapp"} elemRef={noWaInput}/>
                         </div>
                         <span>*Setelah data dikirimkan, tim kami akan menghubungi anda</span>
                         <div className="button-section flex flex-row">
-                            <Button btn={"cta"} text={"Ajukan Sekarang"} funcClick={formDetailSubmit}/>
+                            <Button btn={"cta"} text={"Ajukan Sekarang"} />
                             <Button btn={"underline-btn"} text={"Lihat Syarat & Ketentuan"} funcClick={() => {document.getElementById("syarat").scrollIntoView({block: "center"});}} />
                         </div>
                     </div>

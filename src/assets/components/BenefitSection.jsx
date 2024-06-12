@@ -1,9 +1,9 @@
 import Header2 from "./Header2"
 import SpecialContainer from "./SpecialContainer"
-import boltIcon from '../boltIcon.svg'
-import guardIcon from '../guardIcon.svg'
-import lockIcon from '../lockIcon.svg'
-import trophyIcon from '../trophyIcon.svg'
+import boltIcon from '../icon/boltIcon.svg'
+import guardIcon from '../icon/guardIcon.svg'
+import lockIcon from '../icon/lockIcon.svg'
+import trophyIcon from '../icon/trophyIcon.svg'
 
 const BenefitSection = () => {
     return (
