@@ -33,6 +33,7 @@ const FormSection = () => {
     const nikInput = useRef()
     const namaInput = useRef()
     const fotoFileInput = useRef()
+    const fotoFileLabel = useRef()
     const noWaInput = useRef()
 
     const [fileName, setFileName] = useState("Upload Foto KTP Anda")
@@ -43,6 +44,8 @@ const FormSection = () => {
         let fileExtension = sepFileName[sepFileName.length - 1]
         if (fileExtension == "png" || fileExtension == "jpg" || fileExtension == "jpeg") {
             setFileName(currFileName)
+        } else if (sepFileName == "") {
+            setFileName("Upload Foto KTP Anda")
         } else {
             fotoFileInput.current.value = ''
             fotoFileInput.current.value = null
@@ -67,7 +70,6 @@ const FormSection = () => {
             setType(data.type)
             setModel(null)
             setCC(null)
-            setCC(null)
             setJenis(null)
             setBBM(null)
             setTransmisi(null)
@@ -78,7 +80,6 @@ const FormSection = () => {
             setResult(null)
             setType(null)
             setModel(null)
-            setCC(null)
             setCC(null)
             setJenis(null)
             setBBM(null)
@@ -95,7 +96,6 @@ const FormSection = () => {
             if (data.model != undefined) {
                 setModel(data.model)
                 setCC(null)
-                setCC(null)
                 setJenis(null)
                 setBBM(null)
                 setTransmisi(null)
@@ -104,7 +104,6 @@ const FormSection = () => {
             } else {
                 setResult(null)
                 setModel(null)
-                setCC(null)
                 setCC(null)
                 setJenis(null)
                 setBBM(null)
@@ -122,6 +121,7 @@ const FormSection = () => {
         if (resp.status == 200) {
             const data = await resp.json()
             if (data.cc != undefined) {
+                ccSelect.current.value = ""
                 setCC(data.cc)
                 setJenis(null)
                 setBBM(null)
@@ -131,6 +131,7 @@ const FormSection = () => {
             } else {
                 setResult(null)
                 setCC(null)
+                ccSelect.current.value = ""
                 setJenis(null)
                 setBBM(null)
                 setTransmisi(null)
@@ -242,34 +243,15 @@ const FormSection = () => {
         if (resp.status == 200 && tahunSelect.current.value != "") {
             const data = await resp.json()
             if (data.harga != undefined) {
+                setDetailSubmit(false)
                 setResult(data)
             } else {
                 setResult(null)
                 setDetailSubmit(false)
             }
         } else {
-            setResult(null)
+            setResult(false)
             setDetailSubmit(false)
-        }
-    }
-
-    const getResult = async () => {
-        const resp = await TransportRequestDetail({merk: "/"+merkSelect.current.value,
-                                                    type: "/"+typeSelect.current.value,
-                                                    model: "/"+modelSelect.current.value,
-                                                    cc: "/"+ccSelect.current.value,
-                                                    jenis: "/"+jenisSelect.current.value,
-                                                    bbm: "/"+bbmSelect.current.value,
-                                                    transmisi: "/"+transmisiSelect.current.value,
-                                                    tahun: "/"+tahunSelect.current.value})
-        if (resp.status == 200) {
-            const data = await resp.json()
-            if (data.harga != undefined) {
-                setResult(data)
-            } else {
-                setResult(null)
-                setDetailSubmit(false)
-            }
         }
     }
 
@@ -296,14 +278,21 @@ const FormSection = () => {
                         </div>
                         <div className="button-section flex flex-row">
                             {curresult ?
-                                <Button btn={"cta"} text={"Hitung Limit Anda"} funcClick={() => setDetailSubmit(true)} />
+                                <Button btn={"cta"} text={"Hitung Limit Anda"} funcClick={() => {
+                                    setDetailSubmit(true)
+                                    unitSelectedInput.current.value = curresult.desc + " Tahun " + tahunSelect.current.value
+                                    nikInput.current.disabled = false
+                                    namaInput.current.disabled = false
+                                    fotoFileLabel.current.className = "filePlace flex false"
+                                    noWaInput.current.disabled = false
+                                }} />
                                 : <Button btn={"cta disabled"} text={"Hitung Limit Anda"}/>
                             }
-                            <Button btn={"underline-btn"} text={"Ada Masalah? Hubungi Kami"} url={"#"} />
+                            <Button btn={"underline-btn"} text={"Ada Masalah? Hubungi Kami"} funcClick={() => {document.getElementById("kontak").scrollIntoView({block: "center"});}} />
                         </div>
                     </div>
                     {detailSubmit && curresult ?
-                        <SpecialContainer text={`Selamat! Anda memiliki <b>limit pinjaman ${curresult.harga}</b> dari <b>${curresult.desc}</b> milik anda`} bgColor={"rgb(64, 165, 120)"}/>
+                        <SpecialContainer text={`Selamat! Anda memiliki <b>limit pinjaman Rp ${curresult.harga}</b> dari <b>${curresult.desc} Tahun ${tahunSelect.current.value}</b> milik anda`} bgColor={"rgb(64, 165, 120)"}/>
                         : null
                     }
                 </div>
@@ -318,14 +307,21 @@ const FormSection = () => {
                             <InputFormElement labelText={"Nama (Sesuai KTP)"} elemRef={namaInput} />
                         </div>
                         <div className="flex flex-row">
-                            <FileFormElement labelText={"Foto KTP"} elemRef={fotoFileInput} fileName={fileName} funcChange={fileFormChange}/>
+                            <FileFormElement labelText={"Foto KTP"} fileName={fileName} labelRef={fotoFileLabel}/>
+                            {detailSubmit && curresult ?
+                                <input id="ktp" name="ktp" type="file" ref={fotoFileInput} onChange={fileFormChange} accept="image/png, image/jpg, image/jpeg"/>
+                                : null
+                            }
                         </div>
                         <div className="flex flex-row">
                             <InputFormElement labelText={"Nomor Whatsapp"} elemRef={noWaInput}/>
                         </div>
                         <span>*Setelah data dikirimkan, tim kami akan menghubungi anda</span>
                         <div className="button-section flex flex-row">
-                            <Button btn={"cta"} text={"Ajukan Sekarang"} />
+                            {curresult && detailSubmit ?
+                                <Button btn={"cta"} text={"Ajukan Sekarang"} />
+                                : <Button btn={"cta disabled"} text={"Ajukan Sekarang"} />
+                            }
                             <Button btn={"underline-btn"} text={"Lihat Syarat & Ketentuan"} funcClick={() => {document.getElementById("syarat").scrollIntoView({block: "center"});}} />
                         </div>
                     </div>
