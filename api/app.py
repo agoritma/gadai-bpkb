@@ -1,9 +1,23 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.requests import Request
 from database import Database
+from typing import Annotated
+import os
+from dotenv import load_dotenv
+import aiohttp
+from slowapi.errors import RateLimitExceeded
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
 
+load_dotenv()
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="gadai-api")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 db = Database()
+token = os.environ.get('BOT_TOKEN')
+chatid = os.environ.get('ADMIN_CHAT_ID')
 
 app.add_middleware(
     CORSMiddleware,
@@ -15,14 +29,22 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
+    return {
+        "message": "server is running"
+    }
+
+@app.get("/api/kendaraan")
+@limiter.limit("200/minute")
+async def root(request: Request):
     merkList:list = db.selectDistinct("merk")
     return {
         "status": "running",
         "merk": [merk[0] for merk in merkList]
     }
     
-@app.get("/{merk}")
-async def getMerk(merk:str):
+@app.get("/api/kendaraan/{merk}")
+@limiter.limit("200/minute")
+async def getMerk(request: Request, merk:str):
     try:
         typeList:list = db.selectWhere("type", f"where merk = '{merk}'")
         return {
@@ -33,8 +55,9 @@ async def getMerk(merk:str):
             "type": None
         }
 
-@app.get("/{merk}/{type}")
-async def getType(merk:str, type:str):
+@app.get("/api/kendaraan/{merk}/{type}")
+@limiter.limit("200/minute")
+async def getType(request: Request,merk:str, type:str):
     try:
         modelList:list = db.selectWhere("model", f"where merk = '{merk}' and type = '{type}'")
         return {
@@ -45,8 +68,9 @@ async def getType(merk:str, type:str):
             "model": None
         }
         
-@app.get("/{merk}/{type}/{model}")
-async def getModel(merk:str, type:str, model:str):
+@app.get("/api/kendaraan/{merk}/{type}/{model}")
+@limiter.limit("200/minute")
+async def getModel(request: Request,merk:str, type:str, model:str):
     try:
         ccList:list = db.selectWhere("cc", f"where merk = '{merk}' and model = '{model}'")
         print(ccList)
@@ -58,8 +82,9 @@ async def getModel(merk:str, type:str, model:str):
             "cc": None
         }
         
-@app.get("/{merk}/{type}/{model}/{cc}")
-async def getCC(merk:str, type:str, model:str, cc:str):
+@app.get("/api/kendaraan/{merk}/{type}/{model}/{cc}")
+@limiter.limit("200/minute")
+async def getCC(request: Request,merk:str, type:str, model:str, cc:str):
     try:
         jenisList:list = db.selectWhere("jenis", f"where merk = '{merk}' and type = '{type}' and model = '{model}' and cc = '{cc}'")
         return {
@@ -70,8 +95,9 @@ async def getCC(merk:str, type:str, model:str, cc:str):
             "jenis": None
         }
         
-@app.get("/{merk}/{type}/{model}/{cc}/{jenis}")
-async def getJenis(merk:str, type:str, model:str, cc:str, jenis:str):
+@app.get("/api/kendaraan/{merk}/{type}/{model}/{cc}/{jenis}")
+@limiter.limit("200/minute")
+async def getJenis(request: Request,merk:str, type:str, model:str, cc:str, jenis:str):
     try:
         bbmList:list = db.selectWhere("bbm", f"where merk = '{merk}' and type = '{type}' and model = '{model}' and cc = '{cc}' and jenis = '{jenis}'")
         return {
@@ -82,8 +108,9 @@ async def getJenis(merk:str, type:str, model:str, cc:str, jenis:str):
             "bbm": None
         }
         
-@app.get("/{merk}/{type}/{model}/{cc}/{jenis}/{bbm}")
-async def getBBM(merk:str, type:str, model:str, cc:str, jenis:str, bbm:str):
+@app.get("/api/kendaraan/{merk}/{type}/{model}/{cc}/{jenis}/{bbm}")
+@limiter.limit("200/minute")
+async def getBBM(request: Request,merk:str, type:str, model:str, cc:str, jenis:str, bbm:str):
     try:
         transmisiList:list = db.selectWhere("transmisi", f"where merk = '{merk}' and type = '{type}' and model = '{model}' and cc = '{cc}' and jenis = '{jenis}' and bbm = '{bbm}'")
         return {
@@ -94,8 +121,9 @@ async def getBBM(merk:str, type:str, model:str, cc:str, jenis:str, bbm:str):
             "transmisi": None
         }
         
-@app.get("/{merk}/{type}/{model}/{cc}/{jenis}/{bbm}/{transmisi}")
-async def getTransmisi(merk:str, type:str, model:str, cc:str, jenis:str, bbm:str, transmisi:str):
+@app.get("/api/kendaraan/{merk}/{type}/{model}/{cc}/{jenis}/{bbm}/{transmisi}")
+@limiter.limit("200/minute")
+async def getTransmisi(request: Request,merk:str, type:str, model:str, cc:str, jenis:str, bbm:str, transmisi:str):
     try:
         tahunList:list = db.selectWhere("[2023], [2022], [2021], [2020], [2019], [2018], [2017], [2016], [2015], [2014], [2013], [2012], [2011], [2010], [2009], [2008], [2007], [2006], [2005], [2004], [2003]",
                                         f"where merk = '{merk}' and type = '{type}' and model = '{model}' and cc = '{cc}' and jenis = '{jenis}' and bbm = '{bbm}' and transmisi = '{transmisi}'")
@@ -112,8 +140,9 @@ async def getTransmisi(merk:str, type:str, model:str, cc:str, jenis:str, bbm:str
             "tahun": None
         }
         
-@app.get("/{merk}/{type}/{model}/{cc}/{jenis}/{bbm}/{transmisi}/{tahun}")
-async def getDetail(merk:str, type:str, model:str, cc:str, jenis:str, bbm:str, transmisi:str, tahun:str):
+@app.get("/api/kendaraan/{merk}/{type}/{model}/{cc}/{jenis}/{bbm}/{transmisi}/{tahun}")
+@limiter.limit("200/minute")
+async def getDetail(request: Request, merk:str, type:str, model:str, cc:str, jenis:str, bbm:str, transmisi:str, tahun:str):
     try:
         detail:list = db.selectWhere(f"desc, code, [{tahun}]", f"where merk = '{merk}' and type = '{type}' and model = '{model}' and cc = '{cc}' and jenis = '{jenis}' and bbm = '{bbm}' and transmisi = '{transmisi}'")
         return {
@@ -123,7 +152,32 @@ async def getDetail(merk:str, type:str, model:str, cc:str, jenis:str, bbm:str, t
         }
     except KeyError:
         return None
+            
+@app.post("/api/userdetail")
+@limiter.limit("10/minute")
+async def uploadFile(request: Request, unit: Annotated[str, Form()] ,name:Annotated[str, Form()], nik:Annotated[str, Form()], nomor:Annotated[str, Form()], file:UploadFile = File(...)):
+    unitDesc = " ".join(unit.split(" ")[:-2])
+    unitSelect = db.selectWhere("*", f"where desc = '{unitDesc}'")
+    if (unitSelect):
+        content = file.file.read()
+        if (nomor.startswith("0")):
+            nomor = "62" + nomor[1:]
+        caption = f"Unit: {unit}%0ANama Pengaju: {name}%0ANIK: {nik}%0ANomor Whatsapp: wa.me/{nomor}"
+        URL = f"https://api.telegram.org/bot{token}/sendPhoto?chat_id={chatid}&caption={caption}"
+        async with aiohttp.ClientSession() as session:
+            form = aiohttp.FormData()
+            form.add_field('photo', content)
+            async with session.post(URL, data=form) as resp:
+                if (resp.status == 200):
+                    pass
+                else:
+                    raise HTTPException(500, "FAILED_SEND_DATA")
+    else:
+        raise HTTPException(400, "WRONG_UNIT")
+    file.file.close()
     
+    return {"message": f"DONE_SEND"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:app", host="127.0.0.1", reload=True)
